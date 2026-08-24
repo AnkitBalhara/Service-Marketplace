@@ -217,24 +217,31 @@ export const ServiceDetailPage: React.FC = () => {
                 )}
 
                 {isAuthenticated ? (
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    size="large"
-                    disabled={!selectedSlot || !selectedOffering}
-                    onClick={() => setCheckoutOpen(true)}
-                    sx={{
-                      backgroundColor: '#4f46e5',
-                      '&:hover': { backgroundColor: '#4338ca' },
-                      borderRadius: '12px',
-                      textTransform: 'none',
-                      fontWeight: 700,
-                      py: 1.5,
-                      boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)',
-                    }}
-                  >
-                    Proceed to Confirm & Pay →
-                  </Button>
+                  <>
+                    {user?.role !== 'CUSTOMER' && user?.role !== 'SUPER_ADMIN' && (
+                      <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-3 text-xs">
+                        <strong>Note:</strong> You are logged in as <strong>{user?.name}</strong> (<code>{user?.role}</code>). This role is for moderation/vendor management and cannot book customer appointments. Please switch to a <strong>Customer</strong> persona using the top navbar.
+                      </div>
+                    )}
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      size="large"
+                      disabled={!selectedSlot || !selectedOffering}
+                      onClick={() => setCheckoutOpen(true)}
+                      sx={{
+                        backgroundColor: '#4f46e5',
+                        '&:hover': { backgroundColor: '#4338ca' },
+                        borderRadius: '12px',
+                        textTransform: 'none',
+                        fontWeight: 700,
+                        py: 1.5,
+                        boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)',
+                      }}
+                    >
+                      Proceed to Confirm & Pay →
+                    </Button>
+                  </>
                 ) : (
                   <div className="space-y-2">
                     <p className="text-xs text-amber-700 font-medium text-center bg-amber-50 p-2 rounded-lg border border-amber-200">

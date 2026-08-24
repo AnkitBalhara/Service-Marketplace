@@ -75,6 +75,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         setErrorMessage(
           'Slot Capacity Exceeded: Another user just booked the last available seat for this time slot. Please choose a different slot.'
         );
+      } else if (err.response?.data?.error?.code === 'PERMISSION_DENIED') {
+        const reqPerm = err.response.data.error.details?.requiredPermission || 'booking.create';
+        const userRole = err.response.data.error.details?.role || 'Current Role';
+        setErrorMessage(
+          `Permission Denied: Your current role "${userRole}" does not hold the "${reqPerm}" permission. To book appointments as a customer, please click "⚡ Switch Persona" in the top navbar and switch to a Customer persona (e.g. Priya Sharma or Ananya Roy).`
+        );
       } else if (err.response?.data?.error?.code === 'PAYMENT_FAILED') {
         setErrorMessage(
           `Payment Declined: ${err.response.data.error.message}. The slot was NOT booked and remains free.`
