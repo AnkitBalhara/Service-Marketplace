@@ -106,7 +106,7 @@ export const CataloguePage: React.FC = () => {
             </p>
 
             {/* Search Input Box */}
-            <form onSubmit={handleSearchSubmit} className="pt-2 flex items-center gap-2 max-w-lg">
+            <form onSubmit={handleSearchSubmit} className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 max-w-lg">
               <div className="relative flex-1">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
