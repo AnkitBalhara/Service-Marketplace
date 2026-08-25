@@ -1,12 +1,12 @@
 {
   "info": {
-    "name": "MarketPulse Services Marketplace API",
-    "description": "Comprehensive Postman collection covering Authentication, Catalogue, Derived Slots, Bookings with Concurrency Locks, Mock Payments, and Admin Governance.",
+    "name": "MarketPulse Services Marketplace API (Full Suite)",
+    "description": "Comprehensive Postman collection covering Authentication, Dynamic RBAC, Catalogue, Real-time Slot Engine, Booking State Machine with Concurrency Locks, Mock Payments, and Admin Governance.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "Auth",
+      "name": "1. Authentication (M1)",
       "item": [
         {
           "name": "Login (SuperAdmin)",
@@ -16,6 +16,18 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"superadmin@marketplace.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Login (Approved Vendor)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"vendor.approved@marketplace.com\",\n  \"password\": \"Password123!\"\n}"
             },
             "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
           }
@@ -33,20 +45,56 @@
           }
         },
         {
-          "name": "Get Me (Profile & Permissions)",
+          "name": "Get Current User Profile & Slugs (GET /me)",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
           }
+        },
+        {
+          "name": "Register Customer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"Password123!\",\n  \"phone\": \"+91 9876543210\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register/customer", "host": ["{{baseUrl}}"], "path": ["auth", "register", "customer"] }
+          }
+        },
+        {
+          "name": "Register Vendor (Enters PENDING)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Smith\",\n  \"businessName\": \"Smith Wellness Center\",\n  \"email\": \"jane.smith@example.com\",\n  \"password\": \"Password123!\",\n  \"contactNumber\": \"+91 9876543211\",\n  \"address\": \"123 Health Ave, Bangalore\",\n  \"timezone\": \"Asia/Kolkata\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register/vendor", "host": ["{{baseUrl}}"], "path": ["auth", "register", "vendor"] }
+          }
+        },
+        {
+          "name": "Forgot Password (M1 STRETCH Console Link)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer1@marketplace.com\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/forgot-password", "host": ["{{baseUrl}}"], "path": ["auth", "forgot-password"] }
+          }
         }
       ]
     },
     {
-      "name": "Catalogue & Slots",
+      "name": "2. Catalogue & Hierarchy (M4)",
       "item": [
         {
-          "name": "Get Categories (2-Level Hierarchy)",
+          "name": "Get 2-Level Categories Tree",
           "request": {
             "method": "GET",
             "url": { "raw": "{{baseUrl}}/catalogue/categories", "host": ["{{baseUrl}}"], "path": ["catalogue", "categories"] }
@@ -57,37 +105,92 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/catalogue/services?page=1&limit=10&query=",
+              "raw": "{{baseUrl}}/catalogue/services?page=1&limit=9&query=&categoryId=",
               "host": ["{{baseUrl}}"],
               "path": ["catalogue", "services"],
               "query": [
                 { "key": "page", "value": "1" },
-                { "key": "limit", "value": "10" },
-                { "key": "query", "value": "" }
+                { "key": "limit", "value": "9" },
+                { "key": "query", "value": "" },
+                { "key": "categoryId", "value": "" }
               ]
             }
           }
         },
         {
-          "name": "Derive Real-time Slots",
+          "name": "Get Public Service Detail",
           "request": {
             "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/availability/services/{{serviceId}}/slots?offeringId={{offeringId}}&startDate=2026-08-26&endDate=2026-08-30",
-              "host": ["{{baseUrl}}"],
-              "path": ["availability", "services", "{{serviceId}}", "slots"],
-              "query": [
-                { "key": "offeringId", "value": "{{offeringId}}" },
-                { "key": "startDate", "value": "2026-08-26" },
-                { "key": "endDate", "value": "2026-08-30" }
-              ]
-            }
+            "url": { "raw": "{{baseUrl}}/catalogue/services/{{serviceId}}", "host": ["{{baseUrl}}"], "path": ["catalogue", "services", "{{serviceId}}"] }
           }
         }
       ]
     },
     {
-      "name": "Bookings",
+      "name": "3. Availability & Slot Engine (M5)",
+      "item": [
+        {
+          "name": "Derive Real-time Slots (Rules - Exceptions - Bookings)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/availability/services/{{serviceId}}/slots?offeringId={{offeringId}}&startDate=2026-09-01&endDate=2026-09-07",
+              "host": ["{{baseUrl}}"],
+              "path": ["availability", "services", "{{serviceId}}", "slots"],
+              "query": [
+                { "key": "offeringId", "value": "{{offeringId}}" },
+                { "key": "startDate", "value": "2026-09-01" },
+                { "key": "endDate", "value": "2026-09-07" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Next Available Slot (SHOULD)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/availability/services/{{serviceId}}/next-available?offeringId={{offeringId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["availability", "services", "{{serviceId}}", "next-available"],
+              "query": [{ "key": "offeringId", "value": "{{offeringId}}" }]
+            }
+          }
+        },
+        {
+          "name": "Set Weekly Availability Rules (Vendor)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{vendorToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rules\": [\n    { \"dayOfWeek\": 1, \"startTime\": \"09:00\", \"endTime\": \"17:00\", \"capacity\": 3 },\n    { \"dayOfWeek\": 2, \"startTime\": \"09:00\", \"endTime\": \"17:00\", \"capacity\": 3 }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/vendor/services/{{serviceId}}/availability", "host": ["{{baseUrl}}"], "path": ["vendor", "services", "{{serviceId}}", "availability"] }
+          }
+        },
+        {
+          "name": "Add Date Exception / Holiday Closure",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{vendorToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-10-02\",\n  \"isClosed\": true,\n  \"reason\": \"National Holiday\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/vendor/services/{{serviceId}}/exceptions", "host": ["{{baseUrl}}"], "path": ["vendor", "services", "{{serviceId}}", "exceptions"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Bookings & Concurrency (M6 & M7)",
       "item": [
         {
           "name": "Create Booking (PAY_NOW tok_success)",
@@ -100,13 +203,45 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"serviceId\": \"{{serviceId}}\",\n  \"offeringId\": \"{{offeringId}}\",\n  \"date\": \"2026-08-28\",\n  \"startTime\": \"10:30\",\n  \"paymentMode\": \"PAY_NOW\",\n  \"paymentToken\": \"tok_success\"\n}"
+              "raw": "{\n  \"serviceId\": \"{{serviceId}}\",\n  \"offeringId\": \"{{offeringId}}\",\n  \"date\": \"2026-09-15\",\n  \"startTime\": \"10:30\",\n  \"paymentMode\": \"PAY_NOW\",\n  \"paymentToken\": \"tok_success\"\n}"
             },
             "url": { "raw": "{{baseUrl}}/bookings", "host": ["{{baseUrl}}"], "path": ["bookings"] }
           }
         },
         {
-          "name": "Reschedule Booking",
+          "name": "Create Booking (PAY_NOW tok_fail - Forced Decline)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Idempotency-Key", "value": "idem_{{$timestamp}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"serviceId\": \"{{serviceId}}\",\n  \"offeringId\": \"{{offeringId}}\",\n  \"date\": \"2026-09-15\",\n  \"startTime\": \"10:30\",\n  \"paymentMode\": \"PAY_NOW\",\n  \"paymentToken\": \"tok_fail\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/bookings", "host": ["{{baseUrl}}"], "path": ["bookings"] }
+          }
+        },
+        {
+          "name": "Create Booking (PAY_AFTER - Cash at Appointment)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Idempotency-Key", "value": "idem_{{$timestamp}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"serviceId\": \"{{serviceId}}\",\n  \"offeringId\": \"{{offeringId}}\",\n  \"date\": \"2026-09-15\",\n  \"startTime\": \"11:15\",\n  \"paymentMode\": \"PAY_AFTER\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/bookings", "host": ["{{baseUrl}}"], "path": ["bookings"] }
+          }
+        },
+        {
+          "name": "Reschedule Booking (Atomic Slot Swap)",
           "request": {
             "method": "POST",
             "header": [
@@ -115,13 +250,13 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"date\": \"2026-08-29\",\n  \"startTime\": \"11:15\",\n  \"reason\": \"Schedule adjustment\"\n}"
+              "raw": "{\n  \"date\": \"2026-09-22\",\n  \"startTime\": \"11:15\",\n  \"reason\": \"Schedule adjustment\"\n}"
             },
             "url": { "raw": "{{baseUrl}}/bookings/{{bookingId}}/reschedule", "host": ["{{baseUrl}}"], "path": ["bookings", "{{bookingId}}", "reschedule"] }
           }
         },
         {
-          "name": "Cancel Booking (With Refund)",
+          "name": "Cancel Booking (With Refund if within 24h window)",
           "request": {
             "method": "POST",
             "header": [
@@ -134,14 +269,55 @@
             },
             "url": { "raw": "{{baseUrl}}/bookings/{{bookingId}}/cancel", "host": ["{{baseUrl}}"], "path": ["bookings", "{{bookingId}}", "cancel"] }
           }
+        },
+        {
+          "name": "Vendor Confirm Booking",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{vendorToken}}" }],
+            "url": { "raw": "{{baseUrl}}/bookings/{{bookingId}}/confirm", "host": ["{{baseUrl}}"], "path": ["bookings", "{{bookingId}}", "confirm"] }
+          }
+        },
+        {
+          "name": "Vendor Mark Delivered / Complete",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{vendorToken}}" }],
+            "url": { "raw": "{{baseUrl}}/bookings/{{bookingId}}/complete", "host": ["{{baseUrl}}"], "path": ["bookings", "{{bookingId}}", "complete"] }
+          }
+        },
+        {
+          "name": "Vendor Mark Cash Collected",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{vendorToken}}" }],
+            "url": { "raw": "{{baseUrl}}/bookings/{{bookingId}}/collect-payment", "host": ["{{baseUrl}}"], "path": ["bookings", "{{bookingId}}", "collect-payment"] }
+          }
         }
       ]
     },
     {
-      "name": "Admin",
+      "name": "5. Payments Webhook Simulator (M7)",
       "item": [
         {
-          "name": "Get Dashboard Metrics",
+          "name": "Simulate Payment Webhook (Idempotent)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"payment.success\",\n  \"providerRef\": \"mock_pay_seed001\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/payments/webhook", "host": ["{{baseUrl}}"], "path": ["payments", "webhook"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Admin Governance & RBAC (M2 & M8)",
+      "item": [
+        {
+          "name": "Get Dashboard Metrics KPI",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
@@ -149,11 +325,11 @@
           }
         },
         {
-          "name": "List All Bookings (Cross-Vendor)",
+          "name": "List Vendor Applications",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
-            "url": { "raw": "{{baseUrl}}/admin/bookings?page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["admin", "bookings"] }
+            "url": { "raw": "{{baseUrl}}/admin/vendors?status=PENDING", "host": ["{{baseUrl}}"], "path": ["admin", "vendors"], "query": [{ "key": "status", "value": "PENDING" }] }
           }
         },
         {
@@ -163,6 +339,90 @@
             "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
             "url": { "raw": "{{baseUrl}}/admin/vendors/{{vendorId}}/approve", "host": ["{{baseUrl}}"], "path": ["admin", "vendors", "{{vendorId}}", "approve"] }
           }
+        },
+        {
+          "name": "Reject Vendor (Mandatory Reason)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Invalid trade license provided\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/admin/vendors/{{vendorId}}/reject", "host": ["{{baseUrl}}"], "path": ["admin", "vendors", "{{vendorId}}", "reject"] }
+          }
+        },
+        {
+          "name": "Cross-Vendor Bookings (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/bookings?page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["admin", "bookings"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Admin Force Cancel (Mandatory Reason)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Vendor emergency maintenance closure\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/admin/bookings/{{bookingId}}/force-cancel", "host": ["{{baseUrl}}"], "path": ["admin", "bookings", "{{bookingId}}", "force-cancel"] }
+          }
+        },
+        {
+          "name": "Get Roles & Granular Permission Matrix",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/roles", "host": ["{{baseUrl}}"], "path": ["admin", "roles"] }
+          }
+        },
+        {
+          "name": "Create Custom Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SUPPORT_SPECIALIST\",\n  \"description\": \"Handles customer inquiries and booking cancellations\",\n  \"permissions\": [\"booking.view_all\", \"booking.cancel\"]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/admin/roles", "host": ["{{baseUrl}}"], "path": ["admin", "roles"] }
+          }
+        },
+        {
+          "name": "Create Sub-Admin User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alex Support\",\n  \"email\": \"alex.support@marketplace.com\",\n  \"password\": \"Password123!\",\n  \"roleId\": \"{{roleId}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/admin/sub-admins", "host": ["{{baseUrl}}"], "path": ["admin", "sub-admins"] }
+          }
+        },
+        {
+          "name": "Get Admin Audit Logs (M8 STRETCH)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/audit-logs?page=1&limit=20", "host": ["{{baseUrl}}"], "path": ["admin", "audit-logs"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "20" }] }
+          }
         }
       ]
     }
@@ -170,6 +430,12 @@
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:5001/api" },
     { "key": "token", "value": "" },
-    { "key": "adminToken", "value": "" }
+    { "key": "vendorToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "serviceId", "value": "6a8c48dffb5645bbdc0f6431" },
+    { "key": "offeringId", "value": "6a8c48dffb5645bbdc0f6432" },
+    { "key": "bookingId", "value": "" },
+    { "key": "vendorId", "value": "" },
+    { "key": "roleId", "value": "" }
   ]
 }
