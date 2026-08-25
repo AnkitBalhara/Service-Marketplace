@@ -24,7 +24,7 @@ export const createApp = (): Express => {
   app.use(morgan('dev'));
 
   // OpenAPI / Swagger Documentation endpoint
-  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  app.use('/api/docs', ...(swaggerUi.serve as any), swaggerUi.setup(swaggerDocument) as any);
 
   // Mount API routes
   app.use('/api', apiRoutes);
