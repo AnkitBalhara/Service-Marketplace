@@ -268,22 +268,23 @@ export const Navbar: React.FC = () => {
             variant="outlined"
             size="small"
             onClick={(e) => setPersonaAnchor(e.currentTarget)}
-            endIcon={<ChevronDown className="w-3.5 h-3.5" />}
+            endIcon={<ChevronDown className="w-3.5 h-3.5 text-slate-500" />}
             startIcon={<Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />}
             sx={{
               borderColor: '#cbd5e1',
-              color: '#334155',
+              color: '#1e293b',
               textTransform: 'none',
-              fontSize: '0.75rem',
+              fontSize: '0.78rem',
               fontWeight: 700,
               borderRadius: '10px',
               px: 1.5,
               py: 0.6,
-              bgcolor: '#f8fafc',
-              '&:hover': { borderColor: '#818cf8', backgroundColor: '#f1f5f9' },
+              bgcolor: '#ffffff',
+              boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+              '&:hover': { borderColor: '#6366f1', bgcolor: '#f8fafc', boxShadow: '0 2px 4px 0 rgba(99, 102, 241, 0.15)' },
             }}
           >
-            <span className="hidden sm:inline">Switch</span> Persona
+            Switch Persona
           </Button>
 
           {/* Persona Popover with explicit Box layout and distinct cards */}
@@ -468,33 +469,156 @@ export const Navbar: React.FC = () => {
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
 
-              <Menu
-                anchorEl={userMenuAnchor}
+              {/* User Profile Popover */}
+              <Popover
                 open={Boolean(userMenuAnchor)}
+                anchorEl={userMenuAnchor}
                 onClose={() => setUserMenuAnchor(null)}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                PaperProps={{ sx: { width: 230, borderRadius: '14px', mt: 1.5, p: 1 } }}
+                PaperProps={{
+                  sx: {
+                    width: 260,
+                    borderRadius: '16px',
+                    mt: 1.5,
+                    p: 1.5,
+                    boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15), 0 8px 10px -6px rgba(0,0,0,0.1)',
+                    border: '1px solid #e2e8f0',
+                    backgroundColor: '#ffffff',
+                  },
+                }}
               >
-                <div className="px-3 py-2 border-b border-slate-100 mb-1">
-                  <p className="text-xs font-bold text-slate-900 truncate">{user.name}</p>
-                  <p className="text-[11px] text-slate-500 truncate">{user.email}</p>
-                  <Chip
-                    label={user.role}
-                    size="small"
-                    sx={{ mt: 0.8, height: 20, fontSize: '0.65rem', fontWeight: 700 }}
-                    color="primary"
-                  />
-                </div>
+                {/* User Info Header Card */}
+                <Box sx={{ p: 1.5, mb: 1.5, borderRadius: '12px', bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Avatar sx={{ width: 36, height: 36, bgcolor: '#4f46e5', fontSize: '0.9rem', fontWeight: 800 }}>
+                      {user.name?.charAt(0) || 'U'}
+                    </Avatar>
+                    <Box sx={{ overflow: 'hidden' }}>
+                      <Typography sx={{ fontSize: '0.825rem', fontWeight: 800, color: '#0f172a', lineHeight: 1.2, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                        {user.name}
+                      </Typography>
+                      <Typography sx={{ fontSize: '0.72rem', color: '#64748b', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                        {user.email}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ mt: 1.2 }}>
+                    <Chip
+                      label={user.role}
+                      size="small"
+                      sx={{
+                        fontSize: '0.65rem',
+                        fontWeight: 800,
+                        height: 22,
+                        borderRadius: '6px',
+                        bgcolor: user.role === 'SUPER_ADMIN' ? '#ede9fe' : user.role === 'VENDOR' ? '#d1fae5' : '#dbeafe',
+                        color: user.role === 'SUPER_ADMIN' ? '#6d28d9' : user.role === 'VENDOR' ? '#047857' : '#1d4ed8',
+                      }}
+                    />
+                  </Box>
+                </Box>
 
-                <MenuItem
+                {/* Quick Navigation Links */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 1 }}>
+                  {(user.role === 'CUSTOMER' || user.role === 'SUPER_ADMIN') && (
+                    <Box
+                      onClick={() => {
+                        setUserMenuAnchor(null);
+                        navigate('/customer/bookings');
+                      }}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                        px: 1.5,
+                        py: 1,
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        color: '#334155',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        '&:hover': { bgcolor: '#f1f5f9', color: '#4f46e5' },
+                      }}
+                    >
+                      <Calendar className="w-4 h-4 text-indigo-600" />
+                      My Bookings
+                    </Box>
+                  )}
+                  {(user.role === 'VENDOR' || user.role === 'SUPER_ADMIN') && (
+                    <Box
+                      onClick={() => {
+                        setUserMenuAnchor(null);
+                        navigate('/vendor/dashboard');
+                      }}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                        px: 1.5,
+                        py: 1,
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        color: '#334155',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        '&:hover': { bgcolor: '#f1f5f9', color: '#059669' },
+                      }}
+                    >
+                      <Building className="w-4 h-4 text-emerald-600" />
+                      Vendor Dashboard
+                    </Box>
+                  )}
+                  {(user.role === 'SUPER_ADMIN' || user.role === 'ADMIN' || user.role === 'CATALOGUE_MODERATOR') && (
+                    <Box
+                      onClick={() => {
+                        setUserMenuAnchor(null);
+                        navigate('/admin/dashboard');
+                      }}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                        px: 1.5,
+                        py: 1,
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        color: '#334155',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        '&:hover': { bgcolor: '#f1f5f9', color: '#7c3aed' },
+                      }}
+                    >
+                      <Shield className="w-4 h-4 text-purple-600" />
+                      Admin Console
+                    </Box>
+                  )}
+                </Box>
+
+                <Divider sx={{ my: 1, borderColor: '#f1f5f9' }} />
+
+                {/* Sign Out Button */}
+                <Box
                   onClick={handleLogout}
-                  sx={{ color: '#e11d48', fontSize: '0.8rem', fontWeight: 600, py: 1, borderRadius: '8px' }}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.5,
+                    px: 1.5,
+                    py: 1,
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    color: '#e11d48',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    transition: 'all 0.15s ease-in-out',
+                    '&:hover': { bgcolor: '#ffe4e6', color: '#be123c' },
+                  }}
                 >
-                  <LogOut className="w-4 h-4 mr-2" />
+                  <LogOut className="w-4 h-4" />
                   Sign Out
-                </MenuItem>
-              </Menu>
+                </Box>
+              </Popover>
             </>
           ) : (
             <div className="flex items-center gap-2">
