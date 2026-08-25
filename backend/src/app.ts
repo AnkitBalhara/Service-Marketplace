@@ -26,6 +26,21 @@ export const createApp = (): Express => {
   // OpenAPI / Swagger Documentation endpoint
   app.use('/api/docs', ...(swaggerUi.serve as any), swaggerUi.setup(swaggerDocument) as any);
 
+  // Root Welcome & Health Endpoint
+  app.get('/', (_req, res) => {
+    res.json({
+      status: 'online',
+      message: 'MarketPulse Three-Sided Services Marketplace API is live',
+      documentation: '/api/docs',
+      apiBase: '/api',
+      endpoints: {
+        swaggerDocs: '/api/docs',
+        services: '/api/catalogue/services',
+        categories: '/api/catalogue/categories',
+      },
+    });
+  });
+
   // Mount API routes
   app.use('/api', apiRoutes);
 
