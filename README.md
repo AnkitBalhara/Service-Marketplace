@@ -6,9 +6,9 @@ A production-grade, three-sided services marketplace: Customers book services, V
 
 ## 🌐 Live Deployed Application
 
-- **Frontend Client**: [https://marketpulse-app.vercel.app](https://marketpulse-app.vercel.app) *(Replace with your deployed frontend URL)*
-- **Backend API Gateway**: [https://marketpulse-api.onrender.com/api](https://marketpulse-api.onrender.com/api) *(Replace with your deployed backend URL)*
-- **Interactive Swagger Docs**: [https://marketpulse-api.onrender.com/api/docs](https://marketpulse-api.onrender.com/api/docs)
+- **Frontend Client**: [https://service-marketplace-delta.vercel.app](https://service-marketplace-delta.vercel.app)
+- **Backend API Gateway**: [https://service-marketplace-9esa.onrender.com/api](https://service-marketplace-9esa.onrender.com/api)
+- **Interactive Swagger Docs**: [https://service-marketplace-9esa.onrender.com/api/docs](https://service-marketplace-9esa.onrender.com/api/docs)
 
 > **Quick Evaluator Switcher**: The frontend application includes a **⚡ Switch Persona** button in the header for 1-click login as any seeded persona.
 

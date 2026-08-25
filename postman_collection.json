@@ -428,7 +428,7 @@
     }
   ],
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:5001/api" },
+    { "key": "baseUrl", "value": "https://service-marketplace-9esa.onrender.com/api" },
     { "key": "token", "value": "" },
     { "key": "vendorToken", "value": "" },
     { "key": "adminToken", "value": "" },
